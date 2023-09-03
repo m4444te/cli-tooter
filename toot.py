@@ -1,53 +1,37 @@
-# weather.py
-
 import argparse
-import json
-import sys
-from configparser import ConfigParser
-from urllib import error, parse, request
-# from pprint import pp
+import requests
+from dotenv import load_dotenv
+import os
 
-BASE_MASTODON_API_URL = "http://3615.computer/api/1/statuses"
+load_dotenv()
 
-def _get_access_token():
-    """Fetch the API key from your configuration file.
+def main():
+    parser = argparse.ArgumentParser(description="Share text on the Fediverse")
+    parser.add_argument("text", help="Text to share on the Fediverse")
+    args = parser.parse_args()
 
+    # Define the instance URL and the access token
+    instance_url = os.getenv("MASTODON_INSTANCE_URL")  
+    access_token = os.getenv("MASTODON_ACCESS_TOKEN") 
 
-    Expects a configuration file named "secrets.ini" with structure:
+    # Compose a toot (ActivityPub message)
+    toot = {
+        "type": "Note",
+        "status": args.text
+    }
 
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
 
-        [openweather]
+    # Send the toot to the instance
+    response = requests.post(f"{instance_url}/api/v1/statuses", json=toot, headers=headers)
 
-        api_key=<YOUR-OPENWEATHER-API-KEY>
-
-    """
-
-    config = ConfigParser()
-    config.read("secrets.ini")
-
-    return config["3615.computer"]["access_token"]
-
-
-def read_user_cli_args():
-    """Handles the CLI user interactions.
-
-
-    Returns:
-
-        argparse.Namespace: Populated namespace object
-
-    """
-
-    parser = argparse.ArgumentParser(
-        description="gets text content and posts it to the fediverse"
-    )
-
-    parser.add_argument("text", nargs="+", type=str, help="enter the text content")
-
-    return parser.parse_args()
+    if response.status_code == 200:
+        print("Successfully shared the text on the Fediverse!")
+    else:
+        print(f"Error: {response.status_code} - {response.text}")
 
 if __name__ == "__main__":
-    print(f"access_token : {_get_access_token()}")
-
-    user_args = read_user_cli_args()
-    print(user_args.text)
+    main()
