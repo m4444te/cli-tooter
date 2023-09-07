@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fedi-cli"
+description = "A Command Line Interface (CLI) that take text as input and post in on the Fediverse"
+requires-python = ">=3.8"
+version = "0.1.0"
+license = { text = "MIT" }
+dependencies = [
+  "requests",
+  "python-dotenv",
+]
+
+[project.scripts]
+toot = "toot:main"
