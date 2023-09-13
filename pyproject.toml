@@ -1,17 +1,70 @@
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "fedi-cli"
-description = "A Command Line Interface (CLI) that take text as input and post in on the Fediverse"
-requires-python = ">=3.8"
+[tool.poetry]
+name = "toot"
 version = "0.1.0"
-license = { text = "MIT" }
-dependencies = [
-  "requests",
-  "python-dotenv",
-]
+description = "A Command Line Interface (CLI) that take text as input and post in on the Fediverse"
+authors = ["Mathieu Mescam <mathieu.mescam@gmail.com>"]
+readme = "README.md"
 
-[project.scripts]
-toot = "toot:main"
+[tool.poetry.dependencies]
+python = "^3.8"
+requests = "^2.31.0"
+python-dotenv = "^1.0.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "23.9.1"
+mypy = "1.5.1"
+pre-commit = "3.4.0"
+pytest = "7.4.2"
+pytest-cov = "4.1.0"
+ruff = "0.0.289"
+tomli = { version = "2.0.1", python = "<3.11" }
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+toot = "toot.main:main"
+
+[tool.black]
+line-length = 100
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.egg
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.nox
+  | \.tox
+  | \.venv
+  | \venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | setup.py
+)/
+'''
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--cov=test_1 --cov-report term-missing --no-cov-on-fail"
+
+[tool.coverage.report]
+exclude_lines = ["if __name__ == .__main__.:", "pragma: no cover"]
+
+[tool.ruff]
+select = ["E", "F", "UP", "I001", "T201", "T203"]
+ignore = ["E501"]
+line-length = 100
+target-version = "py38"
+fix = true
